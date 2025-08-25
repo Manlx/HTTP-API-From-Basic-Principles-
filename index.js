@@ -51,14 +51,15 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  const methodHandeler = MethodToHandler[req.method]
+  const methodHandler = MethodToHandler[req.method]
 
-  if (!methodHandeler){
+  if (!methodHandler){
 
     res.statusCode = 404;
     res.writeHead(
       404,
-      "Method not found",{
+      "Method not found",
+      {
         "content-type": "text/json"
       }
     ),
@@ -68,13 +69,14 @@ const server = http.createServer((req, res) => {
     }))
   }
 
-  methodHandeler(req, res);
+  methodHandler(req, res);
 });
 
 // Define the port to listen on const PORT = 3000;
 
 // Start the server and listen on the specified port
 server.listen(PORT, 'localhost', () => {
+
   console.log(`Server running at http://localhost:${PORT}/`);
 });
 
