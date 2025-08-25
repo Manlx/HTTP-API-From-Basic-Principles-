@@ -49,7 +49,7 @@ export function GetUrlPath(req){
 /**
  * Extracts the queryParams and returns a map of the value keys
  * @param {http.IncomingMessage} req 
- * @returns {Map<string, any>}
+ * @returns {Map<string, string>}
  */
 export function QueryParams(req){
 
@@ -86,7 +86,7 @@ export function QueryParams(req){
 /**
  * @param {http.IncomingMessage} req 
  * @param {string} templatePath
- * @returns {Map<string, any>}
+ * @returns {Map<string, string>}
  */
 export function GetPathParams(req, templatePath){
 
