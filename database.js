@@ -35,7 +35,7 @@ export function ResetDB(dbCon) {
 
   userInsert.run('Person C','PersonC@gmail.com')
 
-  const selectAllUsers = dbCon.prepare(`SELECT * FROM users;`)
+  // const selectAllUsers = dbCon.prepare(`SELECT * FROM users;`)
   
   dbCon.close()
 }

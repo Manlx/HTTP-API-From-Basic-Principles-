@@ -4,7 +4,7 @@
 
 import http from "http"
 
-import { dbCon, ResetDB } from "./DataStore.js";
+import { dbCon, ResetDB } from "./database.js";
 import { GetPathParams, MatchUrl, QueryParams } from "./utils.js";
 
 const PORT = 1337;
