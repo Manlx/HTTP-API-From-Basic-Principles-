@@ -21,6 +21,7 @@ export function ResetDB(dbCon) {
 
   dbCon.open();
 
+  // Gen 1 Creation
   dbCon.exec(`
     CREATE TABLE IF NOT EXISTS Users (
       Id INTEGER PRIMARY KEY, 
@@ -45,6 +46,8 @@ export function ResetDB(dbCon) {
     )
   `);
 
+  // Gen 2 Creation
+
   dbCon.exec(`
     CREATE TABLE IF NOT EXISTS ToDoItems (
       Id INTEGER PRIMARY KEY, 
@@ -53,6 +56,20 @@ export function ResetDB(dbCon) {
       FOREIGN KEY(ToDoType) REFERENCES ToDoCategories(Id)
     )
   `);
+
+  dbCon.exec(`
+    CREATE TABLE IF NOT EXISTS UserSessionToken (
+      Id INTEGER PRIMARY KEY, 
+      UserId INTEGER,
+      Token TEXT,
+      IssuedAt INTEGER,
+      ExpiredAt INTEGER,
+      IsInvalidated INTEGER,
+      FOREIGN KEY(UserId) REFERENCES Users(Id)
+    )
+  `);
+
+  // Gen 3 Creation
 
   dbCon.exec(`
     CREATE TABLE IF NOT EXISTS UserToDoItems (
