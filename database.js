@@ -154,26 +154,44 @@ export function ResetDB(dbCon) {
       )
     )
   `)
-
-  // const userInsert = dbCon.prepare("INSERT INTO users(name, email) values (?, ?)");
-
-  // userInsert.run('Person A','PersonA@gmail.com')
-
-  // userInsert.run('Person B','PersonB@gmail.com')
-
-  // userInsert.run('Person C','PersonC@gmail.com')
-
-  // userInsert.run('Person C','PersonC@gmail.com')
-
-  // const selectAllUsers = dbCon.prepare(`SELECT * FROM users;`)
-
-  // console.log(dbCon.prepare(`SELECT name FROM sqlite_schema WHERE type='table' ORDER BY name;`).all())
-  // console.log(dbCon.prepare(`SELECT * FROM ToDoItemUserStatus`).all())
-  // console.log(dbCon.prepare(`SELECT * FROM Users`).all())
-  // console.log(dbCon.prepare(`SELECT * FROM ToDoCategories`).all())
-  console.log(dbCon.prepare(`SELECT * FROM ToDoItems`).all())
   
   dbCon.close()
+}
+
+/**
+ * Get all the users
+ * @param {sqllite.DatabaseSync} dbCon 
+ */
+export function GetUsers(dbCon){
+
+  if (!dbCon.isOpen){
+
+    dbCon.open()
+  }
+
+  return dbCon.prepare(`SELECT * FROM users`).all();
+}
+
+/**
+ * Get all the users
+ * @param {sqllite.DatabaseSync} dbCon 
+ */
+export function GetToDoItems(dbCon){
+
+  if (!dbCon.isOpen){
+
+    dbCon.open()
+  }
+
+  return dbCon.prepare(`
+    SELECT
+      ToDoItems.Id,
+      ToDoItems.DisplayName,
+      ToDoCategories.Description
+    FROM ToDoItems
+    INNER JOIN ToDoCategories
+    ON ToDoItems.ToDoType = ToDoCategories.Id
+  `).all();
 }
 
 export const dbCon = new sqllite.DatabaseSync(dbFilePath,{open: true})
