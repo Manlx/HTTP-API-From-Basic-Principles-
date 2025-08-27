@@ -4,8 +4,9 @@
 
 import http from "http"
 
-import { dbCon, ResetDB } from "./database.js";
-import { GetPathParams, MatchUrl, QueryParams } from "./utils.js";
+import { dbCon, GetToDoItems, GetUsers, ResetDB } from "./database.js";
+import { GetPathParams, MatchUrl, QueryParams, SetJsonReturn } from "./utils.js";
+import { generateToken, validateToken, verifyToken } from "./jwt.js";
 
 const PORT = 1337;
 
@@ -13,24 +14,31 @@ const PORT = 1337;
 const MethodToHandler = {
 
   GET: (req,res) => {
-  
-    res.writeHead(
-      200,{ 
-      'Content-Type': 'text/json' 
-    });
 
-    console.log(QueryParams(req))
+    if (MatchUrl(req, '/users')) {
 
-    console.log(GetPathParams(req, '/{userId}'))
+      SetJsonReturn(res)
+      
+      res.end(JSON.stringify(GetUsers(dbCon)))
+    }
 
-    const urlPath = '/user/:id/name'
+    if (MatchUrl(req, '/ToDoItems')) {
 
-    console.log(`Path matches with ${urlPath} ${MatchUrl(req, urlPath)}`)
+      SetJsonReturn(res)
 
-    res.end(JSON.stringify({
-      Message:"Hello",
-      Method: req.method
-    }))
+      res.end(JSON.stringify(GetToDoItems(dbCon)))
+    }
+
+    const UserToDoItemsURLPath = '/UserToDoItems/:UserId'
+
+    if (MatchUrl(req, UserToDoItemsURLPath)) {
+
+      const pathParams = GetPathParams(req, UserToDoItemsURLPath)
+
+      SetJsonReturn(res)
+
+      res.end(JSON.stringify(GetToDoItems(dbCon)))
+    }
   },
   CONNECT: undefined,
   DELETE: undefined,
@@ -81,3 +89,11 @@ server.listen(PORT, 'localhost', () => {
 });
 
 ResetDB(dbCon)
+
+const token = generateToken({
+  expiresAt: Date.now() - 5 * 1000 * 60,
+  issuedAt: Date.now(),
+  userId: 1
+})
+
+console.log(validateToken(token))
