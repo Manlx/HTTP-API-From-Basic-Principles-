@@ -122,3 +122,28 @@ export function GetPathParams(req, templatePath){
 
   return pathParams;
 }
+
+/**
+ * Sets the status to 200 and content type to JSON
+ * @param {http.ServerResponse<http.IncomingMessage>} res
+ */
+export function SetJsonReturn(res){
+
+  res.writeHead(
+    200,
+    {
+      "content-type": "text/json"
+    }
+  )
+}
+
+/**
+ * Sets the status to 404 and send response
+ * @param {http.ServerResponse<http.IncomingMessage>} res
+ */
+export function Send404(res){
+
+  res.writeHead( 404 )
+
+  res.end();
+}
