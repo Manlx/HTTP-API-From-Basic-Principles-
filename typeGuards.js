@@ -1,7 +1,9 @@
 /** @import {
  * CreateType,
  * LoginBody,
- * typeOfReturn
+ * typeOfReturn,
+ * UserDataGram,
+ UserSessionTokenDataGram
  * } from "./types.js" */
 
 
@@ -54,4 +56,21 @@ export function GenerateObjectTypeProof(exampleObject){
 export const isLoginBody = /** @type {typeof GenerateObjectTypeProof<LoginBody>} */(GenerateObjectTypeProof)({
   Password: 'string',
   UserName: 'string'
+})
+
+export const isUserDataGram = /** @type {typeof GenerateObjectTypeProof<UserDataGram>} */(GenerateObjectTypeProof)({
+  DisplayName: 'string',
+  Id: 'number',
+  IsDeleted: 'number',
+  Password: 'string',
+  UserName: 'string'
+})
+
+export const isUserSessionTokenDataGram = /** @type {typeof GenerateObjectTypeProof<UserSessionTokenDataGram>} */(GenerateObjectTypeProof)({
+  ExpiredAt: 'number',
+  Id: 'number',
+  IsInvalidated: 'number',
+  IssuedAt: 'number',
+  Token: 'string',
+  UserId: 'number'
 })
