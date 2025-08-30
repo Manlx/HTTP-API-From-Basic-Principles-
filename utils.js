@@ -1,6 +1,7 @@
 /** @import http from "http" */
 /** @import {RouteHandler} from "./types.js" */
 
+import { config } from "./config.js";
 import { generateToken } from "./jwt.js";
 
 /**
@@ -178,14 +179,20 @@ export function HandelRoute(routes, req, res) {
 /**
  * Creates a token for a given userId
  * @param {number} userId 
+ * @returns {[false, undefined] | [true, string]}
  */
 export function MakeToken(userId){
 
-  return generateToken({
-    expiresAt: Date.now() + 5 * 1000 * 60,
+  const newToken = generateToken({
+    expiresAt: Date.now() + config.tokenLifeTime,
     issuedAt: Date.now(),
     userId: userId
   })
+
+  return [
+    true,
+    newToken
+  ]
 }
 
 /**
