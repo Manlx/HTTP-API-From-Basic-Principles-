@@ -4,40 +4,87 @@
 
 import http from "http"
 
-import { dbCon, GetToDoItems, GetUsers, ResetDB } from "./database.js";
-import { GetPathParams, MatchUrl, QueryParams, SetJsonReturn } from "./utils.js";
-import { generateToken, validateToken, verifyToken } from "./jwt.js";
+import { 
+  dbCon, 
+  GetToDoItems, 
+  GetUsers, 
+  ResetDB 
+} from "./database.js";
+
+import { 
+  GetPathParams, 
+  HandelRoute, 
+  HandleRoutNotFound, 
+  MatchUrl, 
+  QueryParams, 
+  SetJsonReturn 
+} from "./utils.js";
+
+import { 
+  generateToken, 
+  validateToken, 
+  verifyToken 
+} from "./jwt.js";
+
+import { 
+  LoginHandler, 
+  TodoItemsHandler, 
+  UsersHandler, 
+  UserToDoItemsHandler 
+} from "./handlers/index.js";
+
 
 const PORT = 1337;
 
 /** @type {{[key in HTTPMethods]: ((req: http.IncomingMessage, res: http.ServerResponse<http.IncomingMessage>)=>void) | undefined}} */
 const MethodToHandler = {
 
-  GET: (req,res) => {
+  GET: (req, res) => {
 
-    if (MatchUrl(req, '/users')) {
+    const wasHandled = HandelRoute(
+      [
+        {
+          handler: UsersHandler,
+          route: '/users'
+        },
+        {
+          handler: LoginHandler,
+          route: '/login'
+        },
+        {
+          handler: TodoItemsHandler,
+          route: '/todoItems'
+        },
+        {
+          handler: UserToDoItemsHandler,
+          route: '/userToDoItem'
+        }
+      ],
+      req,
+      res
+    )
 
-      SetJsonReturn(res)
-      
-      res.end(JSON.stringify(GetUsers(dbCon)))
+    if (!wasHandled) {
+
+      HandleRoutNotFound(req,res)
     }
+  },
+  POST: (req, res) => {
 
-    if (MatchUrl(req, '/ToDoItems')) {
+    const wasHandled = HandelRoute(
+      [
+        {
+          handler: LoginHandler,
+          route: '/login'
+        },
+      ],
+      req,
+      res
+    )
 
-      SetJsonReturn(res)
+    if (!wasHandled) {
 
-      res.end(JSON.stringify(GetToDoItems(dbCon)))
-    }
-
-    const UserToDoItemsURLPath = '/UserToDoItems/:UserId'
-
-    if (MatchUrl(req, UserToDoItemsURLPath)) {
-
-      const pathParams = GetPathParams(req, UserToDoItemsURLPath)
-
-      SetJsonReturn(res)
-
-      res.end(JSON.stringify(GetToDoItems(dbCon)))
+      HandleRoutNotFound(req,res)
     }
   },
   CONNECT: undefined,
@@ -45,7 +92,6 @@ const MethodToHandler = {
   HEAD: undefined,
   OPTIONS: undefined,
   PATCH: undefined,
-  POST: undefined,
   PUT: undefined,
   TRACE: undefined,
 }
@@ -89,11 +135,3 @@ server.listen(PORT, 'localhost', () => {
 });
 
 ResetDB(dbCon)
-
-const token = generateToken({
-  expiresAt: Date.now() - 5 * 1000 * 60,
-  issuedAt: Date.now(),
-  userId: 1
-})
-
-console.log(validateToken(token))
