@@ -14,6 +14,7 @@ import {
 import { 
   GetPathParams, 
   HandelRoute, 
+  Handle404, 
   HandleRoutNotFound, 
   MatchUrl, 
   QueryParams, 
@@ -109,18 +110,7 @@ const server = http.createServer((req, res) => {
 
   if (!methodHandler){
 
-    res.statusCode = 404;
-    res.writeHead(
-      404,
-      "Method not found",
-      {
-        "content-type": "text/json"
-      }
-    ),
-
-    res.end(JSON.stringify({
-      message: "Method not found"
-    }))
+    Handle404(req,res, "No handler was found for Method")
   }
 
   methodHandler(req, res);
