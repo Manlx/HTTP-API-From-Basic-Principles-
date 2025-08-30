@@ -90,4 +90,19 @@
  *   [key in keyof T]: stringTypeOf<T[key]>
  * }} CreateType
  */
+
+/**
+ * @typedef {'Error' | 'Info' | 'Debug' | 'Warning' | 'All'} LogLevel
+ */
+
+/**
+ * @typedef {object} Config
+ * @prop {number} tokenLifeTime
+ * @prop {LogLevel[]} customLogLevel
+ */
+
+/**
+ * @typedef {{[key in LogLevel]: (msg: string)=> void}} LogCustomType
+ */
+
 export default {};
