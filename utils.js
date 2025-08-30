@@ -1,4 +1,7 @@
 /** @import http from "http" */
+/** @import {RouteHandler} from "./types.js" */
+
+import { generateToken } from "./jwt.js";
 
 /**
  * @param {http.IncomingMessage} req 
@@ -146,4 +149,120 @@ export function Send404(res){
   res.writeHead( 404 )
 
   res.end();
+}
+
+/**
+ * Takes and incoming request and response object and 
+ * @param {RouteHandler[]} routes 
+ * @param {http.IncomingMessage} req 
+ * @param {http.ServerResponse<http.IncomingMessage>} res
+ * @returns {boolean}
+ */
+export function HandelRoute(routes, req, res) {
+
+  for (let i = 0; i < routes.length; i++){
+
+    const currentRoute = routes[i]
+
+    if (MatchUrl(req,currentRoute.route)){
+
+      currentRoute.handler(req,res, currentRoute.route)
+
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Creates a token for a given userId
+ * @param {number} userId 
+ */
+export function MakeToken(userId){
+
+  return generateToken({
+    expiresAt: Date.now() + 5 * 1000 * 60,
+    issuedAt: Date.now(),
+    userId: userId
+  })
+}
+
+/**
+ * Sends a default not found message for the request method
+ * @param {http.IncomingMessage} req
+ * @param {http.ServerResponse<http.IncomingMessage>} res
+ */
+export function HandleRoutNotFound(req, res){
+
+
+  SetJsonReturn(res);
+
+  res.end(
+    JSON.stringify(
+      {
+        message: `No route for this method (${req.method || 'No method passed'}) was found`
+      },
+      null,
+      2
+    )
+  )
+}
+
+/**
+ * Sends a default message for a bad request
+ * @param {http.IncomingMessage} req
+ * @param {http.ServerResponse<http.IncomingMessage>} res
+ * @param {string} [message]
+ */
+export function Handle400(req, res, message){
+
+  res.writeHead(
+    400,{
+      "content-type": "text/json"
+    }
+  )
+
+  res.end(
+    JSON.stringify(
+      {
+        message: `Bad Request (${req.method || 'No method passed'})${!!message ? '. ': '.' }${message}`
+      },
+      null,
+      2
+    )
+  )
+}
+
+/**
+ * This will take an incoming req and return a promise with the data.
+ * If the request times out there will be no data 
+ * @param {http.IncomingMessage} req 
+ * @param {number} timeout 
+ * @returns {Promise<string|undefined>}
+ */
+export async function GetBodyFromRequest(req, timeout) {
+
+  return new Promise((resolve,reject)=>{
+    
+    let currentBody = '';
+
+    const timeOutId = setTimeout(() => {
+
+      reject(undefined)
+
+    },timeout)
+  
+    req.on('data', (incomingData)=>{
+  
+      currentBody += incomingData
+    })
+  
+    req.on('end', () =>{
+
+      clearTimeout(timeOutId)
+  
+      resolve(currentBody)
+    })
+  })
 }
