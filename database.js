@@ -5,6 +5,9 @@
 import sqllite from "node:sqlite"
 import fs from "fs"
 import { isUserDataGram, isUserSessionTokenDataGram } from "./typeGuards.js"
+import { LogCustom } from "./utils.js"
+import { config } from "./config.js"
+import { generateToken } from "./jwt.js"
 
 const dbFilePath = './dataStore.db'
 
@@ -265,7 +268,8 @@ export function GetUserSessionToken(dbCon, UserId) {
     `
       SELECT *
       FROM UserSessionTokens
-      WHERE UserSessionTokens.UserId = ?   
+      WHERE UserSessionTokens.UserId = ?
+      ORDER BY UserSessionTokens.Id DESC
     `
   )
 
@@ -277,6 +281,72 @@ export function GetUserSessionToken(dbCon, UserId) {
   }
 
   return [false, undefined ];
+}
+
+/**
+ * Creates a token and adds it to the UserSessionToken in the database
+ * @param {sqllite.DatabaseSync} dbCon 
+ * @param {number} UserId
+ * @returns {[string,number | bigint]}
+ */
+export function CreateUserSessionToken(dbCon, UserId) {
+
+  if (!dbCon.isOpen){
+    
+    dbCon.open();
+  }
+
+  const setAllPreviousTokensToInvalidated = dbCon.prepare(`
+    UPDATE UserSessionTokens
+    SET IsInvalidated = 1
+    WHERE UserId = ? AND IsInvalidated <> 1
+  `);
+
+  const changes = setAllPreviousTokensToInvalidated.run(UserId);
+
+  LogCustom.Info(`Token invalidation for user: ${UserId}, invalidated: ${changes.changes} tokens.`)
+
+  const createdAt = Date.now();
+  const expireAt = Date.now() + config.tokenLifeTime;
+
+  const token = generateToken({
+    expiresAt: expireAt,
+    issuedAt: createdAt,
+    userId: UserId
+  })
+
+  const insertUserSessionToken = dbCon.prepare(`
+    INSERT INTO UserSessionTokens(
+      UserId,
+      Token,
+      IssuedAt,
+      ExpiredAt,
+      IsInvalidated
+    )
+    VALUES (
+      ?,
+      ?,
+      ?,
+      ?,
+      ?
+    )
+  `);
+
+  const insertRes = insertUserSessionToken.run(
+    UserId,
+    token,
+    createdAt,
+    expireAt,
+    0
+  );
+
+  LogCustom.Info(`Created inserted a new token for ${UserId} and ${insertRes.changes} were inserted, last id being ${insertRes.lastInsertRowid}`)
+  
+  return [
+    token,
+    changes.changes
+  ]
+
 }
 
 export const dbCon = new sqllite.DatabaseSync(dbFilePath,{open: true})
