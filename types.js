@@ -31,8 +31,8 @@
 
 /**
  * @typedef {object} LoginBody
- * @prop {string} username
- * @prop {string} password
+ * @prop {string} UserName
+ * @prop {string} Password
  */
 
 /**
