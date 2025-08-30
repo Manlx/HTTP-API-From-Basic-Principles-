@@ -1,5 +1,10 @@
+/** @import {
+ * UserSessionTokenDataGram
+ * } from "./types.js" */
+
 import sqllite from "node:sqlite"
 import fs from "fs"
+import { isUserDataGram, isUserSessionTokenDataGram } from "./typeGuards.js"
 
 const dbFilePath = './dataStore.db'
 
@@ -58,7 +63,7 @@ export function ResetDB(dbCon) {
   `);
 
   dbCon.exec(`
-    CREATE TABLE IF NOT EXISTS UserSessionToken (
+    CREATE TABLE IF NOT EXISTS UserSessionTokens (
       Id INTEGER PRIMARY KEY, 
       UserId INTEGER,
       Token TEXT,
@@ -216,6 +221,7 @@ export function GetToDoItems(dbCon){
  * @param {sqllite.DatabaseSync} dbCon 
  * @param {string} username 
  * @param {string} password 
+ * @returns {[true, number] | [false, undefined]}
  */
 export function CanLogin(dbCon, username, password) {
 
@@ -226,17 +232,51 @@ export function CanLogin(dbCon, username, password) {
 
   const findUserByUsernameAndPassword = dbCon.prepare(
     `
-      SELECT Users.Id
+      SELECT *
       FROM Users
       WHERE Users.UserName = ? AND Users.Password = ?   
     `
   )
 
-  const res = findUserByUsernameAndPassword.all(username, password)
+  const res = findUserByUsernameAndPassword.get(username, password)
 
-  console.log(res)
+  if (res && isUserDataGram(res)) {
+    
+    return [true, Number(res.Id) || -1];
+  }
 
-  return res.length > 0;
+  return [false, undefined ];
+}
+
+/**
+ * Sees if a user can log in with a given password and username
+ * @param {sqllite.DatabaseSync} dbCon 
+ * @param {number} UserId
+ * @returns {[true, UserSessionTokenDataGram] | [false, undefined]}
+ */
+export function GetUserSessionToken(dbCon, UserId) {
+
+  if (!dbCon.isOpen){
+    
+    dbCon.open();
+  }
+
+  const findUserSessionTokenByUserId = dbCon.prepare(
+    `
+      SELECT *
+      FROM UserSessionTokens
+      WHERE UserSessionTokens.UserId = ?   
+    `
+  )
+
+  const res = findUserSessionTokenByUserId.get(UserId)
+
+  if (res && isUserSessionTokenDataGram(res)) {
+    
+    return [true, res];
+  }
+
+  return [false, undefined ];
 }
 
 export const dbCon = new sqllite.DatabaseSync(dbFilePath,{open: true})
