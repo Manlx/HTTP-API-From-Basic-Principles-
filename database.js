@@ -211,4 +211,32 @@ export function GetToDoItems(dbCon){
   `).all();
 }
 
+/**
+ * Sees if a user can log in with a given password and username
+ * @param {sqllite.DatabaseSync} dbCon 
+ * @param {string} username 
+ * @param {string} password 
+ */
+export function CanLogin(dbCon, username, password) {
+
+  if (!dbCon.isOpen){
+    
+    dbCon.open();
+  }
+
+  const findUserByUsernameAndPassword = dbCon.prepare(
+    `
+      SELECT Users.Id
+      FROM Users
+      WHERE Users.UserName = ? AND Users.Password = ?   
+    `
+  )
+
+  const res = findUserByUsernameAndPassword.all(username, password)
+
+  console.log(res)
+
+  return res.length > 0;
+}
+
 export const dbCon = new sqllite.DatabaseSync(dbFilePath,{open: true})
