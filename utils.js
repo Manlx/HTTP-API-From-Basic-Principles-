@@ -235,6 +235,56 @@ export function Handle400(req, res, message){
 }
 
 /**
+ * Sends a default message for a 404 response
+ * @param {http.IncomingMessage} req
+ * @param {http.ServerResponse<http.IncomingMessage>} res
+ * @param {string} [message]
+ */
+export function Handle404(req, res, message){
+
+  res.writeHead(
+    404,{
+      "content-type": "text/json"
+    }
+  )
+
+  res.end(
+    JSON.stringify(
+      {
+        message: `Response Not Found (${req.method || 'No method passed'})${!!message ? '. ': '.' }${message}`
+      },
+      null,
+      2
+    )
+  )
+}
+
+/**
+ * Sends a default message for a 401 response
+ * @param {http.IncomingMessage} req
+ * @param {http.ServerResponse<http.IncomingMessage>} res
+ * @param {string} [message]
+ */
+export function Handle401(req, res, message){
+
+  res.writeHead(
+    401,{
+      "content-type": "text/json"
+    }
+  )
+
+  res.end(
+    JSON.stringify(
+      {
+        message: `User is not authorized (${req.method || 'No method passed'})${!!message ? '. ': '.' }${message}`
+      },
+      null,
+      2
+    )
+  )
+}
+
+/**
  * This will take an incoming req and return a promise with the data.
  * If the request times out there will be no data 
  * @param {http.IncomingMessage} req 
