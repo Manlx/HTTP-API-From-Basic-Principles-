@@ -1,5 +1,5 @@
 /** @import http from "http" */
-/** @import {RouteHandler} from "./types.js" */
+/** @import {LogCustomType, LogLevel, RouteHandler} from "./types.js" */
 
 import { config } from "./config.js";
 import { generateToken } from "./jwt.js";
@@ -322,4 +322,39 @@ export async function GetBodyFromRequest(req, timeout) {
       resolve(currentBody)
     })
   })
+}
+
+/**
+ * Creates a function that accepts a message and only logs message at the created level
+ * @param {LogLevel} logLevel 
+ * @returns {(message: string) => void}
+ */
+function CreateCustomLog(logLevel) {
+
+  return (message) => {
+
+    customLog(message, logLevel)
+  }
+}
+
+/** @type {LogCustomType} */
+export const LogCustom = {
+  All: CreateCustomLog('All'),
+  Debug: CreateCustomLog('Debug'),
+  Error: CreateCustomLog('Error'),
+  Info: CreateCustomLog('Info'),
+  Warning: CreateCustomLog('Warning'),
+}
+
+/**
+ * Logs a message to the STDOUT given that in the config the required loglevel is met or Log Level is set to All
+ * @param {string} message 
+ * @param {LogLevel} logLevel 
+ */
+export function customLog(message, logLevel) {
+
+  if (config.customLogLevel.includes('All') || config.customLogLevel.includes(logLevel) ){
+
+    console.log(message)
+  }
 }
