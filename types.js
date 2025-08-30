@@ -17,6 +17,25 @@
  */
 
 /**
+ * @typedef {object} UserDataGram
+ * @prop {number} Id
+ * @prop {string} UserName
+ * @prop {string} DisplayName
+ * @prop {string} Password
+ * @prop {number} IsDeleted
+ */
+
+/**
+ * @typedef {object} UserSessionTokenDataGram
+ * @prop {number} Id
+ * @prop {number} UserId
+ * @prop {string} Token
+ * @prop {number} IssuedAt
+ * @prop {number} ExpiredAt
+ * @prop {number} IsInvalidated
+ */
+
+/**
  * @memberof DataStructures
  * @typedef {"Yes"|"No"} Answers
  */
