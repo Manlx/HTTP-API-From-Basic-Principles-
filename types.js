@@ -55,7 +55,7 @@
  */
 
 /**
- * @typedef { "undefined" | "object" | "boolean" | "number" | "bigint" | "string" | "symbol" | "unknown"} typeOfReturn
+ * @typedef { "undefined" | "object" | "function" | "boolean" | "number" | "bigint" | "string" | "symbol" | "unknown"} typeOfReturn
  */
 
 /**
@@ -66,6 +66,8 @@
  *   ? Extract<typeOfReturn, 'string'>
  *   : T extends undefined
  *   ? Extract<typeOfReturn, 'undefined'>
+ *   : T extends Function
+ *   ? Extract<typeOfReturn, 'function'>
  *   : T extends number
  *   ? Extract<typeOfReturn, 'number'>
  *   : T extends boolean
