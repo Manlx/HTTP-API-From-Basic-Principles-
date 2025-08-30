@@ -64,8 +64,8 @@
  * @template T The type to analyze.
  * @typedef {T extends string
  *   ? Extract<typeOfReturn, 'string'>
- *   : T extends object
- *   ? Extract<typeOfReturn, 'object'>
+ *   : T extends undefined
+ *   ? Extract<typeOfReturn, 'undefined'>
  *   : T extends number
  *   ? Extract<typeOfReturn, 'number'>
  *   : T extends boolean
@@ -74,8 +74,8 @@
  *   ? Extract<typeOfReturn, 'bigint'>
  *   : T extends symbol
  *   ? Extract<typeOfReturn, 'symbol'>
- *   : T extends undefined
- *   ? Extract<typeOfReturn, 'undefined'>
+ *   : T extends object
+ *   ? Extract<typeOfReturn, 'object'>
  *   : "unknown"} stringTypeOf
  */
 
@@ -83,10 +83,9 @@
  * Creates a new type where each property's value is the `stringTypeOf`
  * representation of the original property's type.
  *
- * @template T The object type to transform.
+ * @template {object} T The object type to transform.
  * @typedef {{
  *   [key in keyof T]: stringTypeOf<T[key]>
  * }} CreateType
  */
-
 export default {};
