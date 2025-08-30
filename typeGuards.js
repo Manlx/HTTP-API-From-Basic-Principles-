@@ -39,7 +39,7 @@ export function GenerateObjectTypeProof(exampleObject){
 
       if (
         !(currentKey in data) ||
-        typeof data[data] !== keyValueType
+        typeof data[currentKey] !== keyValueType
       ){
 
         return false;
@@ -52,6 +52,6 @@ export function GenerateObjectTypeProof(exampleObject){
 }
 
 export const isLoginBody = /** @type {typeof GenerateObjectTypeProof<LoginBody>} */(GenerateObjectTypeProof)({
-  password: 'string',
-  username: 'string'
+  Password: 'string',
+  UserName: 'string'
 })
