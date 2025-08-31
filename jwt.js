@@ -97,3 +97,29 @@ export function validateToken(token){
     return false;
   }
 }
+
+
+/**
+ * Decodes a verified token
+ * @param {string} token 
+ * @returns {[true, AuthToken] | [false, undefined]}
+ */
+export function decodeToken(token) {
+
+  const [tokenBase64] = token.split('.');
+
+  const rawToken = Buffer.from(tokenBase64, 'base64').toString('utf-8');
+
+  const tokenObject = JSON.parse(rawToken);
+
+  if (!isAuthTokenObject(tokenObject)){
+
+    return [false, undefined];
+  }
+
+
+  return [
+    true,
+    tokenObject
+  ]
+}
