@@ -1,4 +1,5 @@
 /** @import {
+ * AuthToken,
  * CreateType,
  * LoginBody,
  * typeOfReturn,
@@ -73,4 +74,10 @@ export const isUserSessionTokenDataGram = /** @type {typeof GenerateObjectTypePr
   IssuedAt: 'number',
   Token: 'string',
   UserId: 'number'
+})
+
+export const isAuthTokenObject = /** @type {typeof GenerateObjectTypeProof<AuthToken>} */(GenerateObjectTypeProof)({
+  expiresAt: 'number',
+  issuedAt: 'number',
+  userId: 'number'
 })
