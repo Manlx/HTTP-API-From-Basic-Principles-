@@ -1,8 +1,11 @@
 /** @import {AuthToken} from "./types.js" */
+import 
+  Crypto 
+from "node:crypto"
 
-import { buffer } from "stream/consumers"
-
-import Crypto from "node:crypto"
+import { 
+  isAuthTokenObject 
+} from "./typeGuards.js"
 
 // Obviously don't do this, but I am lazy
 const MySecret = "This is my secret, lol"
@@ -68,24 +71,22 @@ export function validateToken(token){
   }
 
   try {
-    const [bodyBase64] = token.split('.');
+    const [
+      isDecodable,
+      tokenObject
+    ] = decodeToken(token)
 
-    const rawBody = Buffer.from(bodyBase64, 'base64').toString('utf-8');
-
-    const body = JSON.parse(rawBody);
-
-    if (
-      !(
-        'userId' in body &&
-        'issuedAt' in body &&
-        'expiresAt' in body
-      )
-    ){
+    if (!isDecodable){
 
       return false;
     }
 
-    if (Date.now() > body['expiresAt']){
+    if (!isAuthTokenObject(tokenObject)){
+
+      return false;
+    }
+
+    if (Date.now() > tokenObject.expiresAt){
 
       return false;
     }
@@ -116,7 +117,6 @@ export function decodeToken(token) {
 
     return [false, undefined];
   }
-
 
   return [
     true,
