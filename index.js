@@ -32,7 +32,8 @@ import {
   LoginHandler, 
   TodoItemsHandler, 
   UsersHandler, 
-  UserToDoItemsHandler 
+  UserToDoItemsHandler,
+  UserSessionTokenHandler
 } from "./handlers/index.js";
 
 
@@ -65,6 +66,10 @@ const MethodToHandler = {
         {
           handler: UserToDoItemsHandler,
           route: '/userToDoItem'
+        },
+        {
+          handler: UserSessionTokenHandler,
+          route: '/userSessionTokens'
         }
       ],
       req,
