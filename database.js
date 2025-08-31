@@ -349,4 +349,38 @@ export function CreateUserSessionToken(dbCon, UserId) {
 
 }
 
+/**
+ * Gets all the UserSessionTokens 
+ * @param {sqllite.DatabaseSync} dbCon 
+ * @returns {UserSessionTokenDataGram[]}
+ */
+export function GetAllUserSessionTokens(dbCon){
+
+  if (!dbCon.isOpen) {
+
+    dbCon.open()
+  }
+
+  const res = dbCon.prepare(`
+    SELECT *
+    FROM UserSessionTokens
+  `).all()
+
+  /** @type {UserSessionTokenDataGram[]} */
+  const validatedUserSessionTokens = []
+
+  res.forEach((userSessionTokenDatagram)=>{
+
+    if (!isUserSessionTokenDataGram(userSessionTokenDatagram)){
+      
+      return; 
+    }
+
+    validatedUserSessionTokens.push(userSessionTokenDatagram)
+
+  })
+
+  return validatedUserSessionTokens
+}
+
 export const dbCon = new sqllite.DatabaseSync(dbFilePath,{open: true})
