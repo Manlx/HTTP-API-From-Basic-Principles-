@@ -383,4 +383,34 @@ export function GetAllUserSessionTokens(dbCon){
   return validatedUserSessionTokens
 }
 
+/**
+ * Gets the User Session Token record that matches the provided data.
+ * @param {sqllite.DatabaseSync} dbCon 
+ * @param {number} userId 
+ * @param {string} token 
+ * @returns {[false, undefined] | [ true, UserSessionTokenDataGram]}
+ */
+export function GetUserSessionTokenByUserIdAndToken(dbCon,userId, token) {
+
+  if (!dbCon.isOpen) {
+
+    dbCon.open()
+  }
+
+  const getUserSessionToken = dbCon.prepare(`
+    SELECT * 
+    FROM UserSessionTokens
+    WHERE UserId = ? AND Token = ?
+  `);
+
+  const dbRes = getUserSessionToken.get(userId, token);
+
+  if (!dbRes || !isUserSessionTokenDataGram(dbRes)) {
+
+    return [false, undefined]  
+  }
+  
+  return [true, dbRes]
+}
+
 export const dbCon = new sqllite.DatabaseSync(dbFilePath,{open: true})
