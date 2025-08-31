@@ -1,8 +1,9 @@
 /** @import http from "http" */
-/** @import {LogCustomType, LogLevel, RouteHandler} from "./types.js" */
+/** @import {AuthToken, LogCustomType, LogLevel, RouteHandler} from "./types.js" */
 
 import { config } from "./config.js";
-import { generateToken, validateToken, verifyToken } from "./jwt.js";
+import { dbCon, GetUserSessionTokenByUserIdAndToken } from "./database.js";
+import { decodeToken, generateToken, validateToken, verifyToken } from "./jwt.js";
 
 /**
  * @param {http.IncomingMessage} req 
@@ -382,6 +383,37 @@ export function authorizationHandler(req,res){
   if (!validateToken(authToken) || !verifyToken(authToken)) {
 
     Handle401(req,res, 'Token is invalid')
+
+    return false;
+  }
+
+  const [
+    isValidToken,
+    tokenObject
+  ] = decodeToken(authToken)
+
+  if (!isValidToken) {
+
+    Handle401(req,res, 'Token is invalid')
+
+    return false;
+  }
+
+  const [
+    doWeHaveUserSessionToken,
+    userSessionToken
+  ] = GetUserSessionTokenByUserIdAndToken(dbCon, tokenObject.userId, authToken);
+
+  if (!doWeHaveUserSessionToken) {
+
+    Handle401(req,res, 'Token was not issued by us.')
+
+    return false;
+  }
+
+  if (userSessionToken.IsInvalidated){
+
+    Handle401(req,res, 'Session has been invalidated.')
 
     return false;
   }
