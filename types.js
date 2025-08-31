@@ -41,9 +41,13 @@
  */
 
 /**
+ * @typedef {(req: http.IncomingMessage, res: http.ServerResponse<http.IncomingMessage>, route: string ) => void} RouteHandlerFunction
+ */
+
+/**
  * @typedef {object} RouteHandler
  * @prop {string} route
- * @prop {(req: http.IncomingMessage, res: http.ServerResponse<http.IncomingMessage>, route: string ) => void} handler
+ * @prop {RouteHandlerFunction} handler
  */
 
 /** @typedef {(req: http.IncomingMessage, res: http.ServerResponse<http.IncomingMessage>, route: string ) => Promise<void>} HandlerFunction */
@@ -102,7 +106,6 @@
  */
 
 /**
- * @typedef {{[key in LogLevel]: (msg: string)=> void}} LogCustomType
+ * @typedef {{[key in LogLevel]: (msg: any)=> void}} LogCustomType
  */
-
 export default {};
