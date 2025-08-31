@@ -12,6 +12,7 @@ import {
 } from "./database.js";
 
 import { 
+  authorizationHandler,
   GetPathParams, 
   HandelRoute, 
   Handle404, 
@@ -41,6 +42,11 @@ const PORT = 1337;
 const MethodToHandler = {
 
   GET: (req, res) => {
+
+    if (!authorizationHandler(req,res)){
+
+      return;
+    }
 
     const wasHandled = HandelRoute(
       [
