@@ -2,7 +2,7 @@
 /** @import {LogCustomType, LogLevel, RouteHandler} from "./types.js" */
 
 import { config } from "./config.js";
-import { generateToken } from "./jwt.js";
+import { generateToken, validateToken, verifyToken } from "./jwt.js";
 
 /**
  * @param {http.IncomingMessage} req 
@@ -327,7 +327,7 @@ export async function GetBodyFromRequest(req, timeout) {
 /**
  * Creates a function that accepts a message and only logs message at the created level
  * @param {LogLevel} logLevel 
- * @returns {(message: string) => void}
+ * @returns {(message: any) => void}
  */
 function CreateCustomLog(logLevel) {
 
@@ -348,7 +348,7 @@ export const LogCustom = {
 
 /**
  * Logs a message to the STDOUT given that in the config the required loglevel is met or Log Level is set to All
- * @param {string} message 
+ * @param {any} message 
  * @param {LogLevel} logLevel 
  */
 export function customLog(message, logLevel) {
@@ -357,4 +357,34 @@ export function customLog(message, logLevel) {
 
     console.log(message)
   }
+}
+
+
+/**
+ * Middleware to check authorization before continuing down the chain.
+ * @param {http.IncomingMessage} req
+ * @param {http.ServerResponse<http.IncomingMessage>} res
+ * @returns {boolean}
+ */
+export function authorizationHandler(req,res){
+
+  let authToken = req.headers.authorization;
+
+  if (!authToken){
+
+    Handle401(req,res, 'No auth token presented')
+
+    return false;
+  }
+
+  authToken = authToken.replace('Bearer ','');
+
+  if (!validateToken(authToken) || !verifyToken(authToken)) {
+
+    Handle401(req,res, 'Token is invalid')
+
+    return false;
+  }
+
+  return true;
 }
