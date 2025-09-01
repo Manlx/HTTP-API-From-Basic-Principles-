@@ -99,7 +99,6 @@ export function validateToken(token){
   }
 }
 
-
 /**
  * Decodes a verified token
  * @param {string} token 
