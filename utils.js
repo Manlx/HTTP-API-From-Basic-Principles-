@@ -1,5 +1,5 @@
 /** @import http from "http" */
-/** @import {AuthToken, LogCustomType, LogLevel, RouteHandler} from "./types.js" */
+/** @import {LogCustomType, LogLevel, RouteHandler} from "./types.js" */
 
 import { config } from "./config.js";
 import { dbCon, GetUserSessionTokenByUserIdAndToken } from "./database.js";
@@ -18,7 +18,7 @@ export function MatchUrl(req, templatePath){
 
   const templateSubPaths = templatePath.split('/').map(subPath => subPath.trim()).filter( subPath => !!subPath)
 
-  if (incomingSubPaths.length !== templateSubPaths.length){
+  if (incomingSubPaths.length !== templateSubPaths.length && !templatePath.endsWith('/*')){
   
     return false;
   }
@@ -26,6 +26,11 @@ export function MatchUrl(req, templatePath){
   for (let i = 0; i < templateSubPaths.length; i++) {
 
     const templateSubPath = templateSubPaths[i];
+
+    if (templateSubPath.endsWith('*')) {
+
+      return true;
+    }
 
     if (templateSubPath.includes(':') || templateSubPath.includes('{') < templateSubPath.includes('}')){
     
