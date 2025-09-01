@@ -33,7 +33,8 @@ import {
   TodoItemsHandler, 
   UsersHandler, 
   UserToDoItemsHandler,
-  UserSessionTokenHandler
+  UserSessionTokenHandler,
+  HandleFrontend
 } from "./handlers/index.js";
 
 
@@ -43,6 +44,22 @@ const PORT = 1337;
 const MethodToHandler = {
 
   GET: (req, res) => {
+
+      const wasUI = HandelRoute(
+      [
+        {
+          handler: HandleFrontend,
+          route: '/ui/*'
+        }
+      ],
+      req,
+      res
+    )
+
+    if (wasUI){
+
+      return;
+    }
 
     if (!authorizationHandler(req,res)){
 
