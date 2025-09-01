@@ -1,0 +1,59 @@
+/** @import {
+ * LoginRes,
+ * typeOfReturn,
+ * CreateType,
+ * LoginNegativeRes
+ * } from "./types.js" */
+/**
+ * Proves variable contains object type
+ * @param {unknown} possibleObject 
+ * @returns {possibleObject is object}
+ */
+export function isObject(possibleObject) {
+  
+  return typeof possibleObject === "object" && !Array.isArray(possibleObject)
+}
+
+/**
+ * Generates a function to prove that some object based type is a specific sub object type
+ * @template { Object<string,typeOfReturn> | Object<number,typeOfReturn> } ProvenType
+ * @param {CreateType<ProvenType>} exampleObject
+ * @returns {(data: unknown) => data is ProvenType}
+ */
+export function GenerateObjectTypeProof(exampleObject){
+
+  const keys = Object.keys(exampleObject)
+  
+  return /** @type { (data: unknown) => data is ProvenType } */ ((data) => {
+
+    if (!isObject(data)) {
+
+      return false;
+    }
+
+    for (let i = 0; i < keys.length; i++) {
+
+      const currentKey = keys[i];
+      const keyValueType = exampleObject[currentKey];
+
+      if (
+        !(currentKey in data) ||
+        typeof data[currentKey] !== keyValueType
+      ){
+
+        return false;
+      }
+    }
+
+    return true;
+  })
+
+}
+
+export const isLoginRes = /** @type {typeof GenerateObjectTypeProof<LoginRes>} */(GenerateObjectTypeProof)({
+  token: 'string'
+})
+
+export const isNegativeLoginRes = /** @type {typeof GenerateObjectTypeProof<LoginNegativeRes>} */(GenerateObjectTypeProof)({
+  message: 'string'
+})
