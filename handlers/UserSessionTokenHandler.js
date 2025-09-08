@@ -1,4 +1,6 @@
-/** @import http from "http" */
+/** @import {
+ * RouteHandlerFunction
+ * } from "../types.js" */
 
 import { 
   dbCon, 
@@ -9,9 +11,7 @@ import {
   SetJsonReturn 
 } from "../utils.js"
 
-/** @type {(req: http.IncomingMessage, res: http.ServerResponse<http.IncomingMessage>, route: string ) => void} */
-
-export const UserSessionTokenHandler = (req, res, route) => {
+export const UserSessionTokenHandler = /** @type {RouteHandlerFunction<'/userSessionTokens'>} */(req, res, route) => {
 
   SetJsonReturn(res)
 

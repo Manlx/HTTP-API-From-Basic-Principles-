@@ -1,11 +1,11 @@
-/** @import http from "http" */
+/** @import {
+ * RouteHandlerFunction
+ * } from "../types.js" */
 
 import { dbCon, GetToDoItems, GetUsers } from "../database.js"
 import { SetJsonReturn } from "../utils.js"
 
-/** @type {(req: http.IncomingMessage, res: http.ServerResponse<http.IncomingMessage>, route: string ) => void} */
-
-export const TodoItemsHandler = (req, res, route) => {
+export const TodoItemsHandler = /** @type {RouteHandlerFunction<'/todoItems'>} */ (req, res, route) => {
 
   SetJsonReturn(res)
 

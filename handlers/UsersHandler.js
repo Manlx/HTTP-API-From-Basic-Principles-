@@ -1,13 +1,15 @@
-/** @import http from "http" */
+/** @import {
+ * RouteHandlerFunction
+ * } from "../types.js" */
 
 import { dbCon, GetUsers } from "../database.js"
-import { SetJsonReturn } from "../utils.js"
+import { GetPathParams, SetJsonReturn } from "../utils.js"
 
-/** @type {(req: http.IncomingMessage, res: http.ServerResponse<http.IncomingMessage>, route: string ) => void} */
-
-export const UsersHandler = (req, res, route) => {
+export const UsersHandler = /** @type {RouteHandlerFunction<'/login'>} */ (req, res, route) => {
 
   SetJsonReturn(res)
+
+  const temp = GetPathParams(req, '/users/:id/:toDoListItemId/bookmark')
   
   res.end(JSON.stringify(GetUsers(dbCon)))
 }

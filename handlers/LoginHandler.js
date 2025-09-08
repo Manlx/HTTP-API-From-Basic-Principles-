@@ -1,13 +1,28 @@
 /** @import http from "http" */
-/** @import {HandlerFunction} from "../types.js" */
 
-import { CanLogin, CreateUserSessionToken, dbCon, GetUserSessionToken} from "../database.js"
-import { isLoginBody } from "../typeGuards.js";
-import { GetBodyFromRequest, Handle400, Handle401, Handle404, MakeToken, SetJsonReturn } from "../utils.js"
+/** @import {
+ * AsyncRouteHandlerFunction,
+ * RouteHandlerFunction
+ * } from "../types.js" */
 
-/** @type {HandlerFunction} */
+import { 
+  CanLogin, 
+  CreateUserSessionToken, 
+  dbCon, 
+} from "../database.js"
 
-export const LoginHandler = async (req, res, route) => {
+import { 
+  isLoginBody 
+} from "../typeGuards.js";
+
+import { 
+  GetBodyFromRequest, 
+  Handle400, 
+  Handle401, 
+  SetJsonReturn 
+} from "../utils.js"
+
+export const LoginHandler = /** @type {AsyncRouteHandlerFunction<'/login'>} */ async (req, res, route) => {
 
   const body = await GetBodyFromRequest(req,20);
 
