@@ -41,13 +41,17 @@
  */
 
 /**
- * @typedef {(req: http.IncomingMessage, res: http.ServerResponse<http.IncomingMessage>, route: string ) => void} RouteHandlerFunction
+ * @template {string} [Routes='']
+ * @typedef {object} RouteHandler
+ * @prop {Routes} route
+ * @prop {RouteHandlerFunction<Routes>} handler
  */
 
 /**
- * @typedef {object} RouteHandler
- * @prop {string} route
- * @prop {RouteHandlerFunction} handler
+ * @template {string} [Routes='']
+ * @typedef {object} AsyncRouteHandler
+ * @prop {Routes} route
+ * @prop {AsyncRouteHandlerFunction<Routes>} handler
  */
 
 /** @typedef {(req: http.IncomingMessage, res: http.ServerResponse<http.IncomingMessage>, route: string ) => Promise<void>} HandlerFunction */
@@ -67,29 +71,33 @@
  *
  * @template T The type to analyze.
  * @typedef {T extends string
- *   ? Extract<typeOfReturn, 'string'>
- *   : T extends undefined
- *   ? Extract<typeOfReturn, 'undefined'>
- *   : T extends Function
- *   ? Extract<typeOfReturn, 'function'>
- *   : T extends number
- *   ? Extract<typeOfReturn, 'number'>
- *   : T extends boolean
- *   ? Extract<typeOfReturn, 'boolean'>
- *   : T extends bigint
- *   ? Extract<typeOfReturn, 'bigint'>
- *   : T extends symbol
- *   ? Extract<typeOfReturn, 'symbol'>
- *   : T extends object
- *   ? Extract<typeOfReturn, 'object'>
- *   : "unknown"} stringTypeOf
+ * ? Extract<typeOfReturn, 'string'>
+ * : T extends undefined
+ * ? Extract<typeOfReturn, 'undefined'>
+ * : T extends Function
+ * ? Extract<typeOfReturn, 'function'>
+ * : T extends number
+ * ? Extract<typeOfReturn, 'number'>
+ * : T extends boolean
+ * ? Extract<typeOfReturn, 'boolean'>
+ * : T extends bigint
+ * ? Extract<typeOfReturn, 'bigint'>
+ * : T extends symbol
+ * ? Extract<typeOfReturn, 'symbol'>
+ * : T extends RecursiveObject
+ * ? CreateType<T>
+ * : "unknown"} stringTypeOf
+ */
+
+/**
+ * @typedef { {[key in string | number]: RecursiveObject | number | string | boolean | undefined | null | symbol }} RecursiveObject
  */
 
 /**
  * Creates a new type where each property's value is the `stringTypeOf`
  * representation of the original property's type.
  *
- * @template {object} T The object type to transform.
+ * @template {RecursiveObject} T The object type to transform.
  * @typedef {{
  *   [key in keyof T]: stringTypeOf<T[key]>
  * }} CreateType
@@ -108,4 +116,26 @@
 /**
  * @typedef {{[key in LogLevel]: (msg: any)=> void}} LogCustomType
  */
+
+/**
+ * @template {string} T
+ * @typedef { T extends `${infer subPath}/${infer rest}`
+ * ? subPath extends `:${infer param}`
+   * ? {[key in param]: string} & ExtractPathParams<rest>
+   * : ExtractPathParams<rest>
+ * : T extends `:${infer lastParam}`
+  * ? {[key in lastParam]: string}
+  * : {}
+ * } ExtractPathParams
+ */
+
+/**
+ * @template {string} [URLPath='']
+ * @typedef {(req: http.IncomingMessage, res: http.ServerResponse<http.IncomingMessage>, route: URLPath ) => Promise<void>} AsyncRouteHandlerFunction 
+ * */
+
+/**
+ * @template {string} [URLPath='']
+ * @typedef {(req: http.IncomingMessage, res: http.ServerResponse<http.IncomingMessage>, route: URLPath ) => void} RouteHandlerFunction 
+ * */
 export default {};
