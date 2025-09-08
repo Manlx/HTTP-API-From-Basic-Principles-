@@ -2,11 +2,11 @@
  * AuthToken,
  * CreateType,
  * LoginBody,
+ RecursiveObject,
  * typeOfReturn,
  * UserDataGram,
  UserSessionTokenDataGram
  * } from "./types.js" */
-
 
 /**
  * Proves variable contains object type
@@ -19,22 +19,43 @@ export function isObject(possibleObject) {
 }
 
 /**
+ * Proves variable is of RecursiveObject type
+ * @param {unknown} possibleObject 
+ * @returns {possibleObject is RecursiveObject}
+ */
+export function isRecursiveObject(possibleObject) {
+  
+  return typeof possibleObject === "object" && !Array.isArray(possibleObject)
+}
+
+/**
  * Generates a function to prove that some object based type is a specific sub object type
- * @template { Object<string,typeOfReturn> | Object<number,typeOfReturn> } ProvenType
+ * @template { RecursiveObject } ProvenType
  * @param {CreateType<ProvenType>} exampleObject
  * @returns {(data: unknown) => data is ProvenType}
  */
-export function GenerateObjectTypeProof(exampleObject){
+export const GenerateObjectTypeProof = (exampleObject) => {
 
   const keys = Object.keys(exampleObject)
   
-  return /** @type { (data: unknown) => data is ProvenType } */ ((data) => {
+  return /** @type { (data: unknown) => data is ProvenType} */ ((data) => {
+
+    if (typeof data === 'string') {
+
+      try {
+        data = JSON.parse(data)
+      } catch (error) {
+        
+        return false;
+      }
+    }
 
     if (!isObject(data)) {
 
       return false;
     }
 
+    // we are `as ProvenType` a lot but that is because we are assuming an optimistic take on the proof
     for (let i = 0; i < keys.length; i++) {
 
       const currentKey = keys[i];
@@ -42,17 +63,28 @@ export function GenerateObjectTypeProof(exampleObject){
 
       if (
         !(currentKey in data) ||
-        typeof data[currentKey] !== keyValueType
+        (
+          typeof data[currentKey] !== keyValueType &&
+          typeof data[currentKey] !== 'object'
+        )
       ){
 
         return false;
       }
+
+      if (isRecursiveObject(exampleObject[currentKey])) {
+
+        const currentSubObject = data[currentKey]
+
+        return GenerateObjectTypeProof(exampleObject[currentKey])(currentSubObject) 
+      }
     }
 
     return true;
-  })
+  });
 
 }
+
 
 export const isLoginBody = /** @type {typeof GenerateObjectTypeProof<LoginBody>} */(GenerateObjectTypeProof)({
   Password: 'string',
