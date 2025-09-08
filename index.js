@@ -1,32 +1,25 @@
 "use strict"
-// Import the HTTP module
-/** @import {HTTPMethods} from "./types.js" */
 
-import http from "http"
+/** @import {
+ * HTTPMethods, 
+ * RouteHandler
+ * } from "./types.js" */
+
+import 
+  http 
+from "http"
 
 import { 
   dbCon, 
-  GetToDoItems, 
-  GetUsers, 
   ResetDB 
 } from "./database.js";
 
 import { 
   authorizationHandler,
-  GetPathParams, 
   HandelRoute, 
   Handle404, 
-  HandleRoutNotFound, 
-  MatchUrl, 
-  QueryParams, 
-  SetJsonReturn 
+  HandleRouteNotFound404, 
 } from "./utils.js";
-
-import { 
-  generateToken, 
-  validateToken, 
-  verifyToken 
-} from "./jwt.js";
 
 import { 
   LoginHandler, 
@@ -40,7 +33,7 @@ import {
 
 const PORT = 1337;
 
-/** @type {{[key in HTTPMethods]: ((req: http.IncomingMessage, res: http.ServerResponse<http.IncomingMessage>)=>void) | undefined}} */
+/** @type {{[key in HTTPMethods]: ((req: http.IncomingMessage, res: http.ServerResponse<http.IncomingMessage>) => void) | undefined}} */
 const MethodToHandler = {
 
   GET: (req, res) => {
@@ -66,36 +59,41 @@ const MethodToHandler = {
       return;
     }
 
+    /** @type {RouteHandler<any>[]} */
+    const routes = [
+      {
+        handler: UsersHandler,
+        route: '/users'
+      },
+      {
+        handler: LoginHandler,
+        route: '/login'
+      },
+      {
+        handler: TodoItemsHandler,
+        route: '/todoItems'
+      },
+      {
+        handler: UserToDoItemsHandler,
+        route: '/userToDoItem/:userId'
+      },
+      {
+        handler: UserSessionTokenHandler,
+        route: '/userSessionTokens'
+      }
+    ];
+
+
+    // const wasHandled = /** @type { typeof HandelRoute<'/users' | '/login' | '/todoItems' | '/userToDoItem/:userId' | '/userSessionTokens'> }*/ (HandelRoute)(
     const wasHandled = HandelRoute(
-      [
-        {
-          handler: UsersHandler,
-          route: '/users'
-        },
-        {
-          handler: LoginHandler,
-          route: '/login'
-        },
-        {
-          handler: TodoItemsHandler,
-          route: '/todoItems'
-        },
-        {
-          handler: UserToDoItemsHandler,
-          route: '/userToDoItem'
-        },
-        {
-          handler: UserSessionTokenHandler,
-          route: '/userSessionTokens'
-        }
-      ],
+      routes,
       req,
       res
     )
 
     if (!wasHandled) {
 
-      HandleRoutNotFound(req,res)
+      HandleRouteNotFound404(req,res)
     }
   },
   POST: (req, res) => {
@@ -113,7 +111,7 @@ const MethodToHandler = {
 
     if (!wasHandled) {
 
-      HandleRoutNotFound(req,res)
+      HandleRouteNotFound404(req,res)
     }
   },
   CONNECT: undefined,
