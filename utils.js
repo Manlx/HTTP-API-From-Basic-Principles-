@@ -1,5 +1,5 @@
 /** @import http from "http" */
-/** @import {LogCustomType, LogLevel, RouteHandler} from "./types.js" */
+/** @import {AsyncRouteHandler, ExtractPathParams, LogCustomType, LogLevel, RouteHandler} from "./types.js" */
 
 import { config } from "./config.js";
 import { dbCon, GetUserSessionTokenByUserIdAndToken } from "./database.js";
@@ -94,13 +94,15 @@ export function QueryParams(req){
 }
 
 /**
+ * @template {string} [URLPath='']
  * @param {http.IncomingMessage} req 
- * @param {string} templatePath
- * @returns {Map<string, string>}
+ * @param {URLPath} templatePath
+ * @returns {ExtractPathParams<URLPath>}
  */
 export function GetPathParams(req, templatePath){
 
-  const pathParams = new Map();
+  
+  const pathParams = /** @type {ExtractPathParams<URLPath>} */({});
 
   const incomingPath = GetUrlPath(req);
 
@@ -117,14 +119,14 @@ export function GetPathParams(req, templatePath){
 
     if (subPath.startsWith(':')){
 
-      pathParams.set(subPath.replaceAll(':',''), incomingSubPaths[index])
+      pathParams[subPath.replaceAll(':','')] = incomingSubPaths[index]
 
       return;
     }
 
     if (subPath.startsWith('{') && subPath.endsWith('}')){
 
-      pathParams.set(subPath.replace('{','').replace('}',''), incomingSubPaths[index])
+      pathParams[subPath.replace('{','').replace('}','')] = incomingSubPaths[index];
 
       return;
     }
@@ -159,8 +161,9 @@ export function Send404(res){
 }
 
 /**
- * Takes and incoming request and response object and 
- * @param {RouteHandler[]} routes 
+ * Takes and incoming request and response object and
+ * @template {string} URLPaths
+ * @param {Array<RouteHandler<URLPaths> | AsyncRouteHandler<URLPaths>>} routes 
  * @param {http.IncomingMessage} req 
  * @param {http.ServerResponse<http.IncomingMessage>} res
  * @returns {boolean}
@@ -206,7 +209,7 @@ export function MakeToken(userId){
  * @param {http.IncomingMessage} req
  * @param {http.ServerResponse<http.IncomingMessage>} res
  */
-export function HandleRoutNotFound(req, res){
+export function HandleRouteNotFound404(req, res){
 
 
   SetJsonReturn(res);
